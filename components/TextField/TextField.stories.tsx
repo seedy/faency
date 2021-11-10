@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import { Flex } from '../Flex';
 import { TextField, TextFieldProps, TextFieldVariants } from './TextField';
-import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { EyeOpenIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { modifyVariantsForStory } from '../../utils/modifyVariantsForStory';
 
 const BaseTextField = (props: TextFieldProps): JSX.Element => <TextField {...props} />;
@@ -44,9 +44,34 @@ export const Basic: ComponentStory<typeof TextFieldForStory> = (args) => (
   </Flex>
 );
 
-export const PasswordType = Template.bind({});
+export const PasswordType: ComponentStory<typeof TextFieldForStory> = (args) => (
+  <Flex direction="column" gap={2}>
+    <TextFieldForStory id="password-type" label="password" {...args} />
+    <TextFieldForStory id="password-clearable-type" label="password clearable" clearable {...args} />
+    <TextFieldForStory id="password-invalid-type" label="password invalid" state="invalid" {...args} />
+    <TextFieldForStory id="password-clearable-invalid-type" label="password clearable invalid" clearable state="invalid" {...args} />
+  </Flex>
+);
 
-PasswordType.args = { type: 'password', id: 'password-type', label: 'password' };
+PasswordType.args = { type: 'password' };
+
+export const NumberType: ComponentStory<typeof TextFieldForStory> = (args) => (
+  <Flex direction="column" gap={2}>
+    <TextFieldForStory id="number-type" label="number" {...args} />
+    <TextFieldForStory id="number-clearable-type" label="number clearable" clearable {...args} />
+    <TextFieldForStory id="number-clearable-invalid-type" label="number clearable invalid" clearable state="invalid" {...args} />
+    <TextFieldForStory
+      id="number-clearable-invalid-s-a-type"
+      startAdornment={<MagnifyingGlassIcon />}
+      startPadding={1}
+      label="number clearable start adornment invalid"
+      clearable
+      state="invalid"
+      {...args} />
+  </Flex>
+);
+
+NumberType.args = { type: 'number' }
 
 export const Clearable = Basic.bind({});
 Clearable.args = { clearable: true };
@@ -82,3 +107,20 @@ export const DisplayClearable = Display.bind({});
 DisplayClearable.args = {
   clearable: true,
 };
+
+export const Adornments: ComponentStory<typeof TextFieldForStory> = (args) => (
+  <Flex direction="column" gap={2}>
+    <TextFieldForStory id="password-type" label="password" type="password" {...args} />
+    <TextFieldForStory id="number-type" label="number" type="number" {...args} />
+    <TextFieldForStory id="clearable-type" label="clearable" clearable {...args} />
+    <TextFieldForStory id="invalid-type" label="invalid" state="invalid" {...args} />
+    <TextFieldForStory
+      id="adornments-type"
+      startAdornment={<MagnifyingGlassIcon />}
+      startPadding={1}
+      endAdornment={<EyeOpenIcon />}
+      endPadding={1}
+      label="custom adornments"
+      {...args} />
+  </Flex>
+)

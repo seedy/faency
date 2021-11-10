@@ -68,9 +68,6 @@ export const Basic: ComponentStory<typeof InputForStory> = (args) => (
 );
 Basic.args = { placeholder: 'placeholder' };
 
-export const Number = Basic.bind({});
-Number.args = { type: 'number' };
-
 const INPUT_TYPES = [
   'button',
   'checkbox',
@@ -158,7 +155,36 @@ export const Ghost: ComponentStory<typeof InputForStory> = (args) => (
 );
 Ghost.args = { defaultValue: 'value', variant: 'ghost' };
 
-export const Adornments = Basic.bind({});
+export const Adornments: ComponentStory<typeof InputForStory> = (args) => (
+  <Flex direction="column" gap={2}>
+    <Box>
+      <Label>Small</Label>
+      <InputForStory size="small" {...args} />
+    </Box>
+
+    <Box>
+      <Label>Default</Label>
+      <InputForStory {...args} />
+    </Box>
+
+    <Box>
+      <Label>Large</Label>
+      <InputForStory size="large" {...args} />
+    </Box>
+
+    <Box>
+      <Label>Ghost</Label>
+      <InputForStory variant="ghost" {...args} />
+    </Box>
+    <Box>
+      <Label>Invalid</Label>
+      <InputForStory
+        state="invalid"
+        {...args}
+      />
+    </Box>
+  </Flex >
+);
 
 Adornments.args = {
   startAdornment: <MagnifyingGlassIcon />,

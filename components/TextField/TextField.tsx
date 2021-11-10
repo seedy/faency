@@ -5,11 +5,14 @@ import { Box } from '../Box';
 import { Input, InputHandle, InputProps, InputVariants } from '../Input';
 import { Label } from '../Label';
 import { Tooltip } from '../Tooltip';
+import { Flex } from '../Flex';
 import {
   ExclamationTriangleIcon,
   CrossCircledIcon,
   EyeOpenIcon,
   EyeClosedIcon,
+  CaretDownIcon,
+  CaretUpIcon
 } from '@radix-ui/react-icons';
 
 // TYPES
@@ -22,17 +25,12 @@ export type TextFieldProps = InputProps & {
 export type TextFieldVariants = InputVariants;
 
 // COMPONENTS
-const AdornmentGroup = styled('div', {
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-});
-
-const StyledExclamationTriangleIcon = styled(ExclamationTriangleIcon, {
-  '& + *': {
-    marginLeft: '$1',
-  },
-});
+const AdornmentGroup = styled(Flex);
+AdornmentGroup.defaultProps = {
+  direction: 'row',
+  align: 'center',
+  gap: 1,
+}
 
 const StyledEyeOpenIcon = styled(EyeOpenIcon, {
   '@hover': {
@@ -57,6 +55,22 @@ const StyledCrossCircledIcon = styled(CrossCircledIcon, {
     }
   }
 });
+
+const StyledCaretUpIcon = styled(CaretUpIcon, {
+  '@hover': {
+    '&:hover': {
+      cursor: 'pointer'
+    }
+  }
+});
+
+const StyledCaretDownIcon = styled(CaretDownIcon, {
+  '@hover': {
+    '&:hover': {
+      cursor: 'pointer'
+    }
+  }
+})
 
 export const TextField = React.forwardRef<React.ElementRef<typeof Input>, TextFieldProps>(
   (
@@ -87,21 +101,31 @@ export const TextField = React.forwardRef<React.ElementRef<typeof Input>, TextFi
 
     const isPasswordType = React.useMemo(() => type === 'password', [type]);
 
+    const isNumberType = React.useMemo(() => type === 'number', [type]);
+
     const typeOrInnerType = React.useMemo(() => (isPasswordType ? innerType : type), [
       isPasswordType,
       type,
       innerType,
     ]);
 
-    const hasInnerAdornment = React.useMemo(() => clearable || isPasswordType || invalid, [
-      clearable,
-      isPasswordType,
-      invalid,
-    ]);
+    const innerAdornmentProps = React.useMemo(
+      () => [clearable, isPasswordType, isNumberType, invalid],
+      [clearable, isPasswordType, isNumberType, invalid],
+    );
+    const activeInnerAdornments = React.useMemo(
+      () => innerAdornmentProps.filter(prop => prop === true),
+      [innerAdornmentProps]
+    );
+    const endPadding = React.useMemo(
+      () => activeInnerAdornments.length > 0 ? activeInnerAdornments.length as (1 | 2 | 3) : undefined,
+      [activeInnerAdornments],
+    );
 
+    const hasInnerAdornment = React.useMemo(() => activeInnerAdornments.length > 0, [activeInnerAdornments]);
     const hasAdornmentGroup = React.useMemo(
-      () => (clearable && invalid) || (clearable && isPasswordType) || (invalid && isPasswordType),
-      [clearable, invalid, isPasswordType]
+      () => activeInnerAdornments.length > 1,
+      [innerAdornmentProps],
     );
 
     const clearDisabled = React.useMemo(() => readOnly || disabled, [readOnly, disabled]);
@@ -112,6 +136,26 @@ export const TextField = React.forwardRef<React.ElementRef<typeof Input>, TextFi
         current.clear();
       }
     }, [inputRef]);
+
+    const handleIncrement = React.useCallback(
+      () => {
+        const { current } = inputRef;
+        if (current) {
+          current.increment?.();
+        }
+      },
+      [inputRef],
+    );
+
+    const handleDecrement = React.useCallback(
+      () => {
+        const { current } = inputRef;
+        if (current) {
+          current.decrement?.();
+        }
+      },
+      [inputRef],
+    );
 
     const handleFocus = React.useCallback(
       (e) => {
@@ -165,11 +209,21 @@ export const TextField = React.forwardRef<React.ElementRef<typeof Input>, TextFi
           endAdornment={
             hasInnerAdornment && (
               <EndAdornmentWrapper>
-                {invalid && <StyledExclamationTriangleIcon role="alert" aria-label="Invalid" />}
+                {invalid && <ExclamationTriangleIcon role="alert" aria-label="Invalid" />}
                 {isPasswordType && (
                   <Tooltip content={passwordAction}>
                     <PasswordVisibilityToggleIcon aria-label={passwordAction} onClick={togglePasswordVisibility} />
                   </Tooltip>
+                )}
+                {isNumberType && (
+                  <Flex direction="column" align="center">
+                    <Tooltip content="Increment">
+                      <StyledCaretUpIcon aria-label="Increment" onClick={handleIncrement} />
+                    </Tooltip>
+                    <Tooltip content="Decrement">
+                      <StyledCaretDownIcon aria-label="Decrement" onClick={handleDecrement} />
+                    </Tooltip>
+                  </Flex>
                 )}
                 {clearable && !clearDisabled && (
                   <Tooltip content="Clear">
@@ -179,6 +233,7 @@ export const TextField = React.forwardRef<React.ElementRef<typeof Input>, TextFi
               </EndAdornmentWrapper>
             )
           }
+          endPadding={endPadding}
           state={state}
           type={typeOrInnerType}
           disabled={disabled}

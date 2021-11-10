@@ -2,9 +2,6 @@ import React from 'react';
 import { VariantProps } from '@stitches/react';
 import { styled, CSS } from '../../stitches.config';
 import { elevationVariant } from '../Elevation';
-import { Flex } from '../Flex';
-
-import { CaretDownIcon, CaretUpIcon } from '@radix-ui/react-icons';
 
 // CONSTANTS
 const FOCUS_SHADOW = elevationVariant[1].boxShadow; // apply elevation $1 when focus
@@ -13,6 +10,38 @@ const SMALL_HEIGHT = '$5';
 const MEDIUM_HEIGHT = '$6';
 const LARGE_HEIGHT = '$7';
 
+const SIZE_PADDINGS = {
+  small: '$2',
+  medium: '$3',
+  large: '$3',
+};
+
+const SIZES = ['small', 'medium', 'large'] as const;
+const PADDING_VARIANTS = [1, 2, 3] as const;
+const PADDING_ADORNMENTS_SIZE_COMPOUND_VARIANTS: { paddingVariant: typeof PADDING_VARIANTS[number], size: typeof SIZES[number] }[] = PADDING_VARIANTS.reduce(
+  (aggr: { paddingVariant, size }[], paddingVariant) => {
+    return [
+      ...aggr,
+      ...SIZES.map(size => ({ paddingVariant, size })),
+    ];
+  }, []);
+// HELPERS
+const computeStartPaddingWithSize = (startPadding: typeof PADDING_VARIANTS[number], size: typeof SIZES[number]) => ({
+  startPadding,
+  size,
+  css: {
+    paddingInlineStart: `calc(${SIZE_PADDINGS[size]} + ${startPadding - 1} * $1 + ${startPadding * 15}px)`
+  }
+})
+const computeEndPaddingWithSize = (endPadding: typeof PADDING_VARIANTS[number], size: typeof SIZES[number]) => ({
+  endPadding,
+  size,
+  css: {
+    paddingInlineEnd: `calc(${SIZE_PADDINGS[size]} + ${endPadding - 1} * $1 + ${endPadding * 15}px)`
+  }
+})
+
+// COMPONENTS
 const StyledInput = styled('input', {
   // Reset
   appearance: 'none',
@@ -30,13 +59,12 @@ const StyledInput = styled('input', {
   position: 'relative',
   backgroundColor: 'transparent',
   borderRadius: 'inherit', // inherit border radius from InputWrapper
-  boxShadow: 'inset 0 0 0 1px $colors$inputBorder',
   color: '$inputText',
   fontVariantNumeric: 'tabular-nums',
+  boxShadow: 'inset 0 0 0 1px $colors$inputBorder',
   transition: 'box-shadow .1s ease-in-out',
 
   '&[type="number"]': {
-    pr: '0', // remove padding for number native controls
     '&::-webkit-outer-spin-button,&::-webkit-inner-spin-button': {
       appearance: 'none',
     }
@@ -98,11 +126,15 @@ const StyledInput = styled('input', {
         },
       },
     },
-    startAdornment: {
-      true: {},
+    startPadding: {
+      1: {},
+      2: {},
+      3: {},
     },
-    endAdornment: {
-      true: {},
+    endPadding: {
+      1: {},
+      2: {},
+      3: {},
     },
     variant: {
       ghost: {
@@ -153,72 +185,8 @@ const StyledInput = styled('input', {
         boxShadow: 'inset 0 0 0 1px $colors$inputInvalidBorder',
       },
     },
-    {
-      startAdornment: true,
-      size: 'small',
-      css: {
-        paddingInlineStart: 'calc($2 + 15px)',
-      },
-    },
-    {
-      startAdornment: true,
-      size: 'medium',
-      css: {
-        paddingInlineStart: 'calc($3 + 15px)',
-      },
-    },
-    {
-      startAdornment: true,
-      size: 'large',
-      css: {
-        paddingInlineStart: 'calc($3 + 15px)',
-      },
-    },
-    {
-      endAdornment: true,
-      size: 'small',
-      css: {
-        paddingInlineEnd: 'calc($2 + 15px)',
-      },
-    },
-    {
-      endAdornment: true,
-      size: 'medium',
-      css: {
-        paddingInlineEnd: 'calc($3 + 15px)',
-      },
-    },
-    {
-      endAdornment: true,
-      size: 'large',
-      css: {
-        paddingInlineEnd: 'calc($3 + 15px)',
-      },
-    },
-    {
-      endAdornment: true,
-      size: 'small',
-      state: 'invalid',
-      css: {
-        paddingInlineEnd: 'calc($4 + 30px)', // size padding + adornment margins + icon size + icon size
-      },
-    },
-    {
-      endAdornment: true,
-      size: 'medium',
-      state: 'invalid',
-      css: {
-        paddingInlineEnd: 'calc($6 + 30px)', // size padding + adornment margins + icon size + icon size
-      },
-    },
-    {
-      endAdornment: true,
-      size: 'large',
-      state: 'invalid',
-      css: {
-        paddingInlineEnd: 'calc($6 + 30px)', // size padding + adornment margins + icon size + icon size
-      },
-    },
+    ...PADDING_ADORNMENTS_SIZE_COMPOUND_VARIANTS.map(({ paddingVariant, size }) => computeStartPaddingWithSize(paddingVariant, size)),
+    ...PADDING_ADORNMENTS_SIZE_COMPOUND_VARIANTS.map(({ paddingVariant, size }) => computeEndPaddingWithSize(paddingVariant, size)),
   ],
 });
 
@@ -244,14 +212,10 @@ const InputWrapper = styled('div', {
     inset: 0,
   },
 
-  '&:focus-visible': {
+  '&:focus-within': {
     '&::before': {
       backgroundColor: '$inputFocusBg',
-    },
-    '&::after': {
-      backgroundColor: '$primary',
-      opacity: 0.15,
-    },
+    }
   },
 
   '@hover': {
@@ -363,8 +327,7 @@ const AdornmentWrapperEnd = styled(AdornmentWrapper, {
   right: 0,
 });
 
-type DefaultInputVariants = VariantProps<typeof StyledInput>;
-export type InputVariants = Omit<DefaultInputVariants, 'startAdornment' | 'endAdornment'>;
+export type InputVariants = VariantProps<typeof StyledInput>;
 export interface HTMLInputProps extends React.InputHTMLAttributes<any> {
   startAdornment?: React.ReactNode;
   endAdornment?: React.ReactNode;
@@ -376,6 +339,8 @@ export type InputProps = Omit<HTMLInputProps, 'size'> & InputVariants & { css?: 
 export type InputHandle = {
   clear: () => void;
   focus: () => void;
+  increment?: () => void;
+  decrement?: () => void
 };
 
 export const Input = React.forwardRef<InputHandle, InputProps>(
@@ -424,12 +389,12 @@ export const Input = React.forwardRef<InputHandle, InputProps>(
           const { value } = current;
           const numValue = Number(value);
           if (Number.isNaN(numValue)) {
-            return current.value = '-1';
+            current.value = '-1';
+          } else if (Number.isInteger(numValue)) {
+            current.value = (numValue - 1).toString();
+          } else {
+            current.value = (Math.ceil(numValue) - 1).toString();
           }
-          if (Number.isInteger(numValue)) {
-            return current.value = (numValue - 1).toString();
-          }
-          return current.value = (Math.ceil(numValue) - 1).toString();
         }
       },
       [inputRef, onFocus],
@@ -445,8 +410,10 @@ export const Input = React.forwardRef<InputHandle, InputProps>(
           }
         },
         focus: onFocus,
-        increment: onIncrement,
-        decrement: onDecrement,
+        ...(isNumberType ? {
+          increment: onIncrement,
+          decrement: onDecrement,
+        } : {})
       }),
       [inputRef]
     );
@@ -463,33 +430,14 @@ export const Input = React.forwardRef<InputHandle, InputProps>(
 
         <StyledInput
           ref={inputRef}
-          startAdornment={hasStartAdornment}
-          endAdornment={hasEndAdornment}
           size={size}
           type={type}
           {...props}
         />
-        {hasEndAdornment ? (
+        {hasEndAdornment && (
           <AdornmentWrapperEnd size={size}>
             {endAdornment}
-            {isNumberType && (
-              <Flex direction="column" align="center">
-                <CaretUpIcon onClick={onIncrement} />
-                <CaretDownIcon onClick={onDecrement} />
-              </Flex>
-            )}
           </AdornmentWrapperEnd>
-        ) : (
-          <>
-            {isNumberType && (
-              <AdornmentWrapperEnd size={size}>
-                <Flex direction="column" align="center">
-                  <CaretUpIcon onClick={onIncrement} />
-                  <CaretDownIcon onClick={onDecrement} />
-                </Flex>
-              </AdornmentWrapperEnd>
-            )}
-          </>
         )}
       </InputWrapper>
     );
