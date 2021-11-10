@@ -2,6 +2,9 @@ import React from 'react';
 import { VariantProps } from '@stitches/react';
 import { styled, CSS } from '../../stitches.config';
 import { elevationVariant } from '../Elevation';
+import { Flex } from '../Flex';
+
+import { CaretDownIcon, CaretUpIcon } from '@radix-ui/react-icons';
 
 // CONSTANTS
 const FOCUS_SHADOW = elevationVariant[1].boxShadow; // apply elevation $1 when focus
@@ -34,6 +37,9 @@ const StyledInput = styled('input', {
 
   '&[type="number"]': {
     pr: '0', // remove padding for number native controls
+    '&::-webkit-outer-spin-button,&::-webkit-inner-spin-button': {
+      appearance: 'none',
+    }
   },
 
   '&:-webkit-autofill,&:autofill': {
@@ -373,8 +379,61 @@ export type InputHandle = {
 };
 
 export const Input = React.forwardRef<InputHandle, InputProps>(
-  ({ size, startAdornment, endAdornment, css, ...props }, forwardedRef) => {
+  ({ size, startAdornment, endAdornment, type, css, ...props }, forwardedRef) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
+
+    const isNumberType = React.useMemo(
+      () => type === 'number',
+      [type],
+    );
+
+    const onFocus = React.useCallback(
+      () => {
+        const { current } = inputRef;
+        if (current) {
+          current.focus();
+        }
+      },
+      [inputRef],
+    );
+
+    const onIncrement = React.useCallback(
+      () => {
+        onFocus();
+        const { current } = inputRef;
+        if (current) {
+          const { value } = current;
+          const numValue = Number(value);
+          if (Number.isNaN(numValue)) {
+            return current.value = '1';
+          }
+          if (Number.isInteger(numValue)) {
+            return current.value = (numValue + 1).toString();
+          }
+          return current.value = (Math.floor(numValue) + 1).toString();
+        }
+      },
+      [inputRef, onFocus],
+    );
+
+    const onDecrement = React.useCallback(
+      () => {
+        onFocus();
+        const { current } = inputRef;
+        if (current) {
+          const { value } = current;
+          const numValue = Number(value);
+          if (Number.isNaN(numValue)) {
+            return current.value = '-1';
+          }
+          if (Number.isInteger(numValue)) {
+            return current.value = (numValue - 1).toString();
+          }
+          return current.value = (Math.ceil(numValue) - 1).toString();
+        }
+      },
+      [inputRef, onFocus],
+    );
 
     React.useImperativeHandle(
       forwardedRef,
@@ -385,12 +444,9 @@ export const Input = React.forwardRef<InputHandle, InputProps>(
             current.value = '';
           }
         },
-        focus: () => {
-          const { current } = inputRef;
-          if (current) {
-            current.focus();
-          }
-        },
+        focus: onFocus,
+        increment: onIncrement,
+        decrement: onDecrement,
       }),
       [inputRef]
     );
@@ -410,9 +466,31 @@ export const Input = React.forwardRef<InputHandle, InputProps>(
           startAdornment={hasStartAdornment}
           endAdornment={hasEndAdornment}
           size={size}
+          type={type}
           {...props}
         />
-        {hasEndAdornment && <AdornmentWrapperEnd size={size}>{endAdornment}</AdornmentWrapperEnd>}
+        {hasEndAdornment ? (
+          <AdornmentWrapperEnd size={size}>
+            {endAdornment}
+            {isNumberType && (
+              <Flex direction="column" align="center">
+                <CaretUpIcon onClick={onIncrement} />
+                <CaretDownIcon onClick={onDecrement} />
+              </Flex>
+            )}
+          </AdornmentWrapperEnd>
+        ) : (
+          <>
+            {isNumberType && (
+              <AdornmentWrapperEnd size={size}>
+                <Flex direction="column" align="center">
+                  <CaretUpIcon onClick={onIncrement} />
+                  <CaretDownIcon onClick={onDecrement} />
+                </Flex>
+              </AdornmentWrapperEnd>
+            )}
+          </>
+        )}
       </InputWrapper>
     );
   }

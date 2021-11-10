@@ -68,6 +68,9 @@ export const Basic: ComponentStory<typeof InputForStory> = (args) => (
 );
 Basic.args = { placeholder: 'placeholder' };
 
+export const Number = Basic.bind({});
+Number.args = { type: 'number' };
+
 const INPUT_TYPES = [
   'button',
   'checkbox',
