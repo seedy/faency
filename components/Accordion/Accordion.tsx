@@ -35,13 +35,13 @@ const StyledAccordionItem = styled(AccordionPrimitive.Item, {
   boxShadow: '0 1px 0 0 $colors$divider',
 })
 
-const StyledAccordionHeader = styled(AccordionPrimitive.Header, {
+export const StyledAccordionHeader = styled(AccordionPrimitive.Header, {
   all: 'unset',
   display: 'flex',
   borderRadius: 'inherit',
 });
 
-const StyledAccordionTrigger = styled(AccordionPrimitive.Trigger, {
+export const StyledAccordionTrigger = styled(AccordionPrimitive.Trigger, {
   all: 'unset',
   borderRadius: 'inherit',
   fontFamily: 'inherit',
@@ -73,7 +73,6 @@ const StyledAccordionTrigger = styled(AccordionPrimitive.Trigger, {
       }
     },
   },
-  transition: 'opacity 200ms ease-out',
   variants: {
     size: {
       small: {
@@ -147,6 +146,18 @@ export const AccordionTrigger = React.forwardRef<
       </StyledAccordionTrigger>
     </StyledAccordionHeader>
   ));
+
+export const RadioAccordionTrigger = React.forwardRef<
+  React.ElementRef<any>, any>(({ children, ['data-state']: dataState, ...props }, forwardedRef) => {
+    console.log(dataState);
+    return (
+      <StyledAccordionHeader>
+        <StyledAccordionTrigger ref={forwardedRef} {...props}>
+          <input type="radio" />
+        </StyledAccordionTrigger>
+      </StyledAccordionHeader>
+    )
+  });
 
 export type AccordionContentProps = VariantProps<typeof StyledAccordionContent> & VariantProps<typeof StyledAccordionContentWrapper> & {
   children: React.ReactNode
