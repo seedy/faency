@@ -71,12 +71,12 @@ interface RadioAccordionTriggerProps extends Omit<ComponentProps<typeof Radio>, 
   children?: React.ReactNode
 }
 export const RadioAccordionTrigger = React.forwardRef<
-  React.ElementRef<typeof StyledAccordionTrigger>, RadioAccordionTriggerProps>(({ children, ...props }) => {
+  React.ElementRef<typeof StyledAccordionTrigger>, RadioAccordionTriggerProps>(({ children, ...props }, ref) => {
     const { value: groupValue } = useRadioAccordionContext();
     const { value: itemValue } = useRadioAccordionItemContext();
 
     return (
-      <StyledAccordionTrigger>
+      <StyledAccordionTrigger ref={ref}>
         <Radio css={{ mr: '$2' }} tabIndex={-1} value={itemValue as string} checked={itemValue === groupValue} {...props} />
         {children}
       </StyledAccordionTrigger>
