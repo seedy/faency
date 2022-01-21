@@ -1,7 +1,6 @@
 import React from 'react';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import { styled, CSS, VariantProps } from '../../stitches.config';
-import { modifyVariantsForStory } from '../../utils/modifyVariantsForStory';
 
 export const RadioGroup = styled(RadioGroupPrimitive.Root, {
   display: 'flex',
