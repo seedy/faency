@@ -1,6 +1,6 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import React, { useState } from 'react';
-import { AccordionRoot, AccordionItem, AccordionTrigger, StyledAccordionTrigger, StyledAccordionHeader, AccordionContent, RadioAccordionTrigger } from '.';
+import { AccordionRoot, AccordionItem, AccordionTrigger, AccordionContent } from '.';
 import { modifyVariantsForStory } from '../../utils/modifyVariantsForStory';
 import { VariantProps } from '../../stitches.config';
 
@@ -124,34 +124,3 @@ Complex.argTypes = {
     options: ['small', 'medium', 'large'],
   }
 }
-
-export const RadioAccordion
-  : ComponentStory<typeof AccordionForStory> = (args) => {
-    const DEFAULT = 'item-1';
-    const [value, setValue] = useState(DEFAULT)
-    return (
-      <Box css={{ width: 300 }}>
-        <AccordionForStory defaultValue={DEFAULT} value={value} onValueChange={setValue} {...args}>
-          <AccordionItem value="item-1">
-            <StyledAccordionHeader>
-              <StyledAccordionTrigger>
-                <input type="radio" value="item-1" checked={value === 'item-1'} />
-                <Label variant="default" size="2">Item-1</Label>
-              </StyledAccordionTrigger>
-            </StyledAccordionHeader>
-            <AccordionContent>
-              <Flex gap="2">
-                <MagnifyingGlassIcon />
-                <Text>More information</Text>
-                <Text>Version</Text>
-              </Flex>
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-2">
-            <RadioAccordionTrigger />
-            <AccordionContent>Item2 Content</AccordionContent>
-          </AccordionItem>
-        </AccordionForStory>
-      </Box>
-    )
-  }
