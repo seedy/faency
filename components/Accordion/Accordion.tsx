@@ -1,9 +1,8 @@
 import React from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
-import { keyframes, styled } from '../../stitches.config';
+import { keyframes, styled, VariantProps } from '../../stitches.config';
 import { elevationVariants } from '../Elevation';
 import { ChevronRightIcon } from '@radix-ui/react-icons';
-import { VariantProps } from '@stitches/react';
 
 const open = keyframes({
   from: { height: 0 },
@@ -15,7 +14,7 @@ const close = keyframes({
   to: { height: 0 },
 });
 
-const StyledAccordionRoot = styled(AccordionPrimitive.Root, {
+export const StyledAccordionRoot = styled(AccordionPrimitive.Root, {
   borderRadius: 0,
   bc: 'transparent',
   variants: {
@@ -146,18 +145,6 @@ export const AccordionTrigger = React.forwardRef<
       </StyledAccordionTrigger>
     </StyledAccordionHeader>
   ));
-
-export const RadioAccordionTrigger = React.forwardRef<
-  React.ElementRef<any>, any>(({ children, ['data-state']: dataState, ...props }, forwardedRef) => {
-    console.log(dataState);
-    return (
-      <StyledAccordionHeader>
-        <StyledAccordionTrigger ref={forwardedRef} {...props}>
-          <input type="radio" />
-        </StyledAccordionTrigger>
-      </StyledAccordionHeader>
-    )
-  });
 
 export type AccordionContentProps = VariantProps<typeof StyledAccordionContent> & VariantProps<typeof StyledAccordionContentWrapper> & {
   children: React.ReactNode
