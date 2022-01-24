@@ -1,86 +1,57 @@
-import { VariantProps } from "@stitches/react";
-import React, { useContext, createContext, useMemo, ComponentProps, useState, useCallback } from "react";
-import { StyledAccordionRoot, StyledAccordionTrigger, AccordionContent, AccordionItem } from "../Accordion";
-import { RadioGroup, Radio } from "../Radio";
-
-// CONTEXT
-const RadioAccordionContext = createContext<{ value?: string }>({
-  value: undefined,
-});
-
-const RadioAccordionItemContext = createContext<{ value?: string }>({
-  value: undefined,
-});
-
-// HOOKS
-const useRadioAccordionContext = () => useContext(RadioAccordionContext);
-
-const useRadioAccordionItemContext = () => useContext(RadioAccordionItemContext);
+import React, { ComponentProps } from "react";
+import { styled } from "../../stitches.config";
+import { StyledAccordionRoot, StyledAccordionTrigger, StyledAccordionHeader, AccordionContent, AccordionItem, AccordionTriggerProps } from "../Accordion";
+import { INDICATOR_BASE_STYLES, RADIO_BASE_STYLES } from "../Radio";
 
 type RadioAccordionRootProps = ComponentProps<typeof StyledAccordionRoot> & {
   type: 'single'
   css?: any
 }
-export const RadioAccordionRoot: (props: RadioAccordionRootProps) => JSX.Element = ({ type = 'single', defaultValue, onValueChange, ...props }) => {
-  const [value, setValue] = useState(defaultValue);
-
-  const handleValueChange = useCallback(
-    (nextValue: string) => {
-      setValue(nextValue)
-      if (onValueChange) {
-        onValueChange(nextValue);
-      }
-    },
-    [setValue],
-  );
-
-  const contextValue = useMemo(
-    () => ({
-      value,
-    }),
-    [value],
-  );
+export const RadioAccordionRoot: (props: RadioAccordionRootProps) => JSX.Element = ({ type = 'single', ...props }) => {
 
   return (
-    <RadioAccordionContext.Provider value={contextValue}>
-      <RadioGroup value={value} css={{ flexDirection: 'column' }} asChild>
-        <StyledAccordionRoot type={type} onValueChange={handleValueChange} {...props} />
-      </RadioGroup>
-    </RadioAccordionContext.Provider>
+    <StyledAccordionRoot type={type} {...props} />
   )
 }
 
 export const RadioAccordionItem = React.forwardRef<React.ElementRef<typeof AccordionItem>, ComponentProps<typeof AccordionItem>>(({ value, children, ...props }, forwardedRef) => {
-  const contextValue = useMemo(
-    () => ({
-      value,
-    }),
-    [value],
-  );
 
   return (
-    <RadioAccordionItemContext.Provider value={contextValue}>
-      <AccordionItem value={value} ref={forwardedRef} css={{ display: 'inherit', flexDirection: 'column' } as any} {...props}>
-        {children}
-      </AccordionItem>
-    </RadioAccordionItemContext.Provider>
+    <AccordionItem value={value} ref={forwardedRef} css={{ display: 'inherit', flexDirection: 'column' } as any} {...props}>
+      {children}
+    </AccordionItem>
   );
 });
 
-interface RadioAccordionTriggerProps extends Omit<ComponentProps<typeof Radio>, 'value'> {
-  children?: React.ReactNode
-}
+const StyledRadio = styled('div', RADIO_BASE_STYLES, {
+  width: 18,
+  height: 18,
+  mr: '$2',
+})
+
+const StyledIndicator = styled('div', INDICATOR_BASE_STYLES, {
+  '&::after': {
+    '[data-state=open] &': {
+      backgroundColor: '$radioIndicator'
+    },
+    '[data-state=closed] &': {
+      backgroundColor: 'transparent',
+    }
+  },
+});
+
 export const RadioAccordionTrigger = React.forwardRef<
-  React.ElementRef<typeof StyledAccordionTrigger>, RadioAccordionTriggerProps>(({ children, ...props }, ref) => {
-    const { value: groupValue } = useRadioAccordionContext();
-    const { value: itemValue } = useRadioAccordionItemContext();
+  React.ElementRef<typeof StyledAccordionTrigger>, AccordionTriggerProps>(({ children, ...props }, ref) => {
 
     return (
-      <StyledAccordionTrigger ref={ref}>
-        <Radio css={{ mr: '$2' }} tabIndex={-1} value={itemValue as string} checked={itemValue === groupValue} {...props} />
-        {children}
-      </StyledAccordionTrigger>
-
+      <StyledAccordionHeader>
+        <StyledAccordionTrigger ref={ref} {...props}>
+          <StyledRadio >
+            <StyledIndicator />
+          </StyledRadio>
+          {children}
+        </StyledAccordionTrigger>
+      </StyledAccordionHeader>
     )
   })
 

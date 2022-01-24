@@ -6,7 +6,7 @@ export const RadioGroup = styled(RadioGroupPrimitive.Root, {
   display: 'flex',
 });
 
-const StyledIndicator = styled(RadioGroupPrimitive.Indicator, {
+export const INDICATOR_BASE_STYLES = {
   alignItems: 'center',
   display: 'flex',
   height: '100%',
@@ -18,12 +18,15 @@ const StyledIndicator = styled(RadioGroupPrimitive.Indicator, {
     display: 'block',
     width: '8px',
     height: '8px',
-    borderRadius: '50%',
+    borderRadius: '$round',
     backgroundColor: '$radioIndicator',
   },
-});
 
-const StyledRadio = styled(RadioGroupPrimitive.Item, {
+}
+
+const StyledIndicator = styled(RadioGroupPrimitive.Indicator, INDICATOR_BASE_STYLES);
+
+export const RADIO_BASE_STYLES = {
   all: 'unset',
   boxSizing: 'border-box',
   userSelect: 'none',
@@ -44,10 +47,14 @@ const StyledRadio = styled(RadioGroupPrimitive.Item, {
   textDecoration: 'none',
   WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 
-  borderRadius: '50%',
+  borderRadius: '$round',
   color: '$hiContrast',
   boxShadow: 'inset 0 0 0 1px $colors$radioBorder',
   overflow: 'hidden',
+
+}
+
+const StyledRadio = styled(RadioGroupPrimitive.Item, RADIO_BASE_STYLES, {
   '@hover': {
     '&:hover': {
       boxShadow: 'inset 0 0 0 1px $colors$radioHoverBorder',
