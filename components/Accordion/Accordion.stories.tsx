@@ -1,15 +1,13 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import React, { useState } from 'react';
+import React from 'react';
 import { AccordionRoot, AccordionItem, AccordionTrigger, AccordionContent } from '.';
 import { modifyVariantsForStory } from '../../utils/modifyVariantsForStory';
 import { VariantProps } from '../../stitches.config';
 
 import { Badge } from '../Badge';
 import { Text } from '../Text';
-import { Label } from '../Label';
 import { Box } from '../Box';
 import { Flex } from '../Flex';
-import { Radio, RadioGroup } from '../Radio'
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
 
 type AccordionVariants = VariantProps<typeof AccordionRoot>
